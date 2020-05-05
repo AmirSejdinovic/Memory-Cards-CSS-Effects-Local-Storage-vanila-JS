@@ -18,7 +18,8 @@ let currentActiveCard = 0;
 const cardsEl = [];
 
 //Store card data
-const cardData = [
+const cardData = getCardsData();
+/*const cardData = [
   {
     question: "What must a variable begin with?",
     answer: "A letter, $ or _",
@@ -31,7 +32,7 @@ const cardData = [
     question: "Example of Case Sensitive Variable",
     answer: "thisIsAVariable",
   },
-];
+];*/
 
 //Create all cards
 function createCards() {
@@ -72,6 +73,19 @@ function updateCurrentText() {
   currentEl.innerText = `${currentActiveCard + 1}/${cardsEl.length}`;
 }
 
+//Get cards from local storage
+function getCardsData() {
+  const cards = JSON.parse(localStorage.getItem("cards"));
+  return cards === null ? [] : cards;
+}
+
+//Add card to local sotage
+function setCardData(cards) {
+  localStorage.setItem("cards", JSON.stringify(cards));
+
+  window.location.reload();
+}
+
 createCards();
 
 //Event listeners
@@ -101,4 +115,38 @@ prevBtn.addEventListener("click", () => {
   cardsEl[currentActiveCard].className = "card active";
 
   updateCurrentText();
+});
+
+showBtn.addEventListener("click", () => {
+  addContainer.classList.add("show");
+});
+
+hideBtn.addEventListener("click", () => {
+  addContainer.classList.remove("show");
+});
+
+addCardBtn.addEventListener("click", () => {
+  const question = questionEl.value;
+  const answer = answerEl.value;
+
+  if (question.trim() && answer.trim()) {
+    const newCard = { question, answer };
+
+    createCard(newCard);
+    questionEl.value = "";
+    answerEl.value = "";
+
+    addContainer.classList.remove("show");
+
+    cardData.push(newCard);
+    //Saving in local storage
+    setCardData(cardData);
+  }
+});
+
+//Clear cards button
+clearBtn.addEventListener("click", () => {
+  localStorage.clear();
+  cardsContainer.innerHTML = "";
+  window.location.reload();
 });
